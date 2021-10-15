@@ -112,7 +112,7 @@ Component usage:
 
 ## Examples
 
-Test example with .desertp file and compiled html are in [examples folder](#./test-data)
+Test example with .desertp file and compiled html are in [examples folder](./test-data)
 
 ## Usage
 
