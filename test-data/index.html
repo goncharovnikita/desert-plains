@@ -1,0 +1,12 @@
+<html><head><title>Desert plains test page</title><style>body {margin: 0;padding: 0;font-family: Helvetica Neue;box-sizing: border-box;--tertiary-color: #1e5f74;}.theme-dark {color: #fcdab7;background-color: #1d2d50;}.container {margin: 0 auto;display: flex;align-items: center;flex-direction: column;margin-top: 2em;height: 100vh;}.title {font-size: 3em;margin: 0 3em;text-align: center;}.link {color: inherit;}.content {margin: 2em 0;flex-grow: 1;}.btn {padding: 0.4em 0.8em;background-color: var(--tertiary-color);border: none;border-radius: 0.4em;color: inherit;font-size: 1.3rem;}.component-demo {display: grid;grid-template-columns: 1fr 1fr;grid-column-gap: 1em;align-items: center;}.footer {margin: 3em auto;}</style><script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script><script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script></head><body class="theme-dark"><div id="app"></div><script>const {useState,useEffect,useReducer,useCallback,createElement:ce}=React;
+const Counter = ({children,up,name}) => {
+const [count, setCount] = useState(0);
+        const increment = useCallback(() => setCount(c => up ? c + 1 : c - 1), []);
+    return ce(React.Fragment, null, `Counter ${name} is ${count}`, ce("button",{className: "btn",onClick: increment},`Increment`))
+}
+;
+const Welcommer = ({children,name}) => {
+const capitalizedName = name.toUpperCase();
+    return ce(React.Fragment, null, ce("div",{className: "welcommer"},ce("h1",{},`Hello, ${capitalizedName}`)))
+}
+ReactDOM.render(ce("div",{className: "container main"},`Hello there, in body!`,ce("h1",{className: "title"},`This page rendered by Desert Plains in React!`),ce("div",{className: "content"},ce("div",{className: "component-demo"},ce(Counter,{up: true,name: "Up"},),ce(Counter,{name: "Down 2"},),ce(Welcommer,{name: "Полина"},))),ce("div",{className: "footer"},ce("a",{className: "link",href: "/about"},`About`))),document.getElementById('app'))</script></body></html>

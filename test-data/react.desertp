@@ -1,0 +1,11 @@
+
+[Counter
+    {{
+        const [count, setCount] = useState(0);
+    }}
+    
+    "count is {{count}}"
+    [button click={{() => {
+        setCounter(c => c + 1);
+    }}}]
+]

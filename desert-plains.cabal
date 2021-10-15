@@ -1,0 +1,86 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 59673a8e3f317f9fc32183797b467249816843290bfd87920e9c3270c5d4a7f8
+
+name:           desert-plains
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/goncharovnikita/desert-plains#readme>
+homepage:       https://github.com/goncharovnikita/desert-plains#readme
+bug-reports:    https://github.com/goncharovnikita/desert-plains/issues
+author:         Nikita Goncharov
+maintainer:     goncharovnikita.dev@gmail.com
+copyright:      2020 Nikita Goncharov
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/goncharovnikita/desert-plains
+
+library
+  exposed-modules:
+      ArgumentsParser
+      Helpers
+      Lib
+      Model
+      Parser
+      ReactRenderer
+      Renderer
+  other-modules:
+      Paths_desert_plains
+  hs-source-dirs:
+      src
+  default-extensions: NoImplicitPrelude , OverloadedStrings
+  build-depends:
+      base >=4.7 && <5
+    , classy-prelude
+    , fsnotify
+    , mtl
+    , parsec
+  default-language: Haskell2010
+
+executable desert-plains-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_desert_plains
+  hs-source-dirs:
+      app
+  default-extensions: NoImplicitPrelude , OverloadedStrings
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Wall
+  build-depends:
+      base >=4.7 && <5
+    , classy-prelude
+    , desert-plains
+    , fsnotify
+    , mtl
+    , parsec
+  default-language: Haskell2010
+
+test-suite desert-plains-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      HelpersSpec
+      ParserSpec
+      Paths_desert_plains
+  hs-source-dirs:
+      test
+  default-extensions: NoImplicitPrelude , OverloadedStrings
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , classy-prelude
+    , desert-plains
+    , fsnotify
+    , hspec
+    , mtl
+    , parsec
+  default-language: Haskell2010
