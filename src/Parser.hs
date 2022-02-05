@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralisedNewtypeDeriving #-}
+-- {-# LANGUAGE GeneralisedNewtypeDeriving #-}
 module Parser ( 
     parseTemplate,
     parseChar,
@@ -135,14 +135,14 @@ parseBodyContents = many parseBodyContentItem
 
 parseBodyContentItem :: TemplateParser BodyNodeFamily
 parseBodyContentItem = 
-    (   (interWhitespace $ TextNode <$> stringLiteral)
+    interWhitespace $ TextNode <$> stringLiteral
     <|> bodyParser H1 "h1"
     <|> bodyParser Div "div"
     <|> bodyParser A "a"
     <|> bodyParser Button "button"
     <|> interWhitespace parseComponentExpression
     <|> BodyInterpolatedString <$> interWhitespace parseInterpolatedString
-    )
+   
 
 bodyParser :: ([Attribute] -> [BodyNodeFamily] -> BodyNodeFamily) -> Text -> TemplateParser BodyNodeFamily
 bodyParser constr tagName = interWhitespace $ uncurry constr <$> parseTagWithAttributes tagName parseBodyContents
@@ -225,7 +225,7 @@ parseCharCond cond = TemplateParser $ \text ->
     in case text' of
         Nothing -> writer (Nothing, ["Error parse charCond: empty input provided"])
         Just txt -> case cond $ head txt of
-            False -> writer (Nothing, [concat ["Error parse charCond"]])
+            False -> writer (Nothing, ["Error parse charCond"])
             True -> writer (Just (tail txt, head txt), [])
 
 parseChar :: Element Text -> TemplateParser (Element Text)

@@ -17,7 +17,7 @@ argsToList list = case parseCommand list of
     Just (arg, xs) -> arg:argsToList xs
 
 hasArg :: Arg -> [Arg] -> Bool
-hasArg arg = any (== arg)
+hasArg = elem
 
 parseArgs :: IO (Either Text (Text, Text, Bool))
 parseArgs = do
@@ -41,7 +41,7 @@ compilePlain (src, dest) = do
             putStr $ concat ["\nCompiled template\n", pack $ show templ, "\n\n"]
             let renderedTemplate = render templ
             putStrLn $ "About to write " <> renderedTemplate
-            writeFileUtf8 (unpack dest) $ renderedTemplate
+            writeFileUtf8 (unpack dest) renderedTemplate
 
 recompile :: (Text, Text) -> Action
 recompile (src, dest) evt =
@@ -80,4 +80,3 @@ main = do
                     watchAndRecompile (src, dest)
                 _ -> do
                     compilePlain (concat [src, "/", "index.desertp"], dest)
-    -- putStrLn $ fromList $ show (runTemplateParser (parseTemplate) testTemplate)

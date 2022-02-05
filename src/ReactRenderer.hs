@@ -151,5 +151,5 @@ renderAttribute attr = case attr of
     ID idName -> concat ["id=\"", idName, "\""]
     BasicAttribute (attrName, attrValue) -> concat [attrName, "=\"", attrValue, "\""]
     BoolAttribute attrName -> attrName
+    InterpolatedAttribute _ -> ""
 
------ HELPERS

@@ -1,17 +1,18 @@
 module Renderer
-    ( someFunc
-    , render
+    ( render
     ) where
 
 
 import ClassyPrelude
 import Model
 
-someFunc :: IO ()
-someFunc = putStrLn "someFunc"
-
 class Renderable a where
     render :: a -> Text
+
+instance Renderable InterpolatedString where
+    render (InterpolatedString children) = concat ["`", concatMap render children, "`"]
+    render (InterpolatedText txt) = txt
+    render (InterpolatedValue val) = concat ["${", val, "}"]
 
 instance Renderable Text where
     render = id
@@ -29,6 +30,7 @@ instance Renderable HeadNodeFamily where
         HeadNode children -> makeSimpleTag "head" children
         Title txt -> makeSimpleTag "title" [txt]
         StyleNode styleNode -> render styleNode
+        SelfContainedScriptNode attrs -> renderHeadScript attrs
 
 
 instance Renderable BodyNodeFamily where
@@ -39,6 +41,8 @@ instance Renderable BodyNodeFamily where
         (A attrs tmpl) -> makeTagWithAttributes "a" attrs tmpl
         (Button attrs tmpl) -> makeTagWithAttributes "button" attrs tmpl
         (TextNode txt) -> txt
+        (ComponentExpression txt _ _) -> txt
+        (BodyInterpolatedString txt) -> render txt
 
 instance Renderable Template where
     render (Html h b _) = makeSimpleTag "html" [render h, render b]
@@ -58,3 +62,11 @@ renderAttribute :: Attribute -> Text
 renderAttribute attr = case attr of
     ClassList classes -> concat ["class=\"", unwords classes, "\""]
     BasicAttribute (attrName, attrValue) -> concat [attrName, "=\"", attrValue, "\""]
+    ID _ -> ""
+    InterpolatedAttribute _ -> ""
+    BoolAttribute _ -> ""
+
+renderHeadScript :: [Attribute] -> Text
+renderHeadScript attributes = makeTagWithAttributes "script" attributes emptyChildren
+    where emptyChildren :: [HeadNodeFamily]
+          emptyChildren = []
