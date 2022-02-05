@@ -83,7 +83,7 @@ spec = describe "ParserSpec" $ do
             execTemplateParserForResult parseBodyContentItem "{Hello, #name}" `shouldBe` Right (BodyInterpolatedString $ InterpolatedString [InterpolatedText "Hello, ", InterpolatedValue "name"])
     describe "parseBodyContents" $ do
         it "should parse body contents" $
-            execTemplateParserForResult parseBodyContents "[h1 {Hello, #name}]" `shouldBe` Right ([H1 [] [BodyInterpolatedString $ InterpolatedString [InterpolatedText "Hello, ", InterpolatedValue "name"]]])
+            execTemplateParserForResult parseBodyContents "[h1 {Hello, #name}]" `shouldBe` Right [H1 [] [BodyInterpolatedString $ InterpolatedString [InterpolatedText "Hello, ", InterpolatedValue "name"]]]
     describe "parseComponentLogic" $ do
         it "should parse component logic" $
             execTemplateParserForResult parseComponentLogic "{{\nconst [s, cs] = useState(0);\nlet a = ''\n}}" `shouldBe` Right ["const [s, cs] = useState(0);\nlet a = ''\n"]

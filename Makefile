@@ -1,4 +1,4 @@
-.PHONY: test build install run
+.PHONY: test build install run lint
 
 test:
 	stack test
@@ -11,3 +11,6 @@ build:
 
 run:
 	stack exec desert-plains-exe
+
+lint:
+	hlint .

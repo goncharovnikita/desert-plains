@@ -1,0 +1,20 @@
+name: lint
+
+on:
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  hlint:
+    runs-on: ubuntu-latest
+    name: Hlint
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: 'Set up HLint'
+      uses: haskell/actions/hlint-setup@v1
+      with:
+        version: '3.3.6'
+
+    - run: make lint
