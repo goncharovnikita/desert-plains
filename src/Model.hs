@@ -49,3 +49,11 @@ data Component = Component
 
 data Template = Html HeadNodeFamily BodyNodeFamily [Component]
     deriving (Show, Eq)
+
+----- Startup Models
+
+data Arg
+    = Src Text
+    | Dest Text
+    | Watch
+    deriving (Eq, Show)
