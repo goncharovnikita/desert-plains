@@ -4,19 +4,6 @@ import ClassyPrelude
 import Lib
 import System.FSNotify
 import Control.Concurrent (threadDelay)
--- import Control.Monad (forever)
-
-testTemplate :: Text
-testTemplate = "\
-\[head]\n\
-\   [title \"Desert plains test page\"]\n\
-\[head]\n\
-\\
-\[body]\
-\\"Hello there, in body!\"\
-\[h1 \"Some very nice title here\" [h1 \"Embedded title\"]]\
-\[body]\
-\"
 
 parseCommand :: [Text] -> Maybe (Arg, [Text])
 parseCommand ("--src":src:xs) = Just (Src src, xs)

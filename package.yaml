@@ -1,10 +1,10 @@
 name:                desert-plains
 version:             0.1.0.0
 github:              "goncharovnikita/desert-plains"
-license:             BSD3
-author:              "Nikita Goncharov"
+license:             MIT
+author:              "Goncharov Nikita"
 maintainer:          "goncharovnikita.dev@gmail.com"
-copyright:           "2020 Nikita Goncharov"
+copyright:           "2022 Goncharov Nikita"
 
 extra-source-files:
 - README.md
@@ -40,7 +40,6 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
-    - -Wall
     dependencies:
     - desert-plains
 
