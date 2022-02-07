@@ -5,6 +5,7 @@ module HtmlRenderer
 
 import ClassyPrelude
 import qualified Html.Style
+import qualified Html.HeadTags
 import Html.Head (Head(..))
 import Html.Body (Body(..))
 import Html.Html (Html(..))
@@ -20,7 +21,6 @@ instance Renderable Text where
 
 instance Renderable Html.Style.Style where
     render template = case template of
-        Html.Style.Style children -> makeTag "style" children
         Html.Style.StyleElement elementName children ->
             concat [elementName, " {", concatMap render children, "}"]
         Html.Style.StyleProperty (propName, propValue) ->
@@ -43,7 +43,7 @@ instance Renderable HeadTag where
         Base attrs -> makeSelfClosingTag "base" attrs
         Link attrs -> makeSelfClosingTag "link" attrs
         Meta attrs -> makeSelfClosingTag "meta" attrs
-        _ -> ""
+        Style style -> makeTag "style" [style]
 
 instance Renderable BodyTag where
     render bodyTag = case bodyTag of

@@ -5,6 +5,8 @@ import ClassyPrelude
 import HtmlRenderer (render)
 import Html.HeadTags (HeadTag(..))
 import Html.Attribute (Attribute(BasicAttribute))
+import qualified Html.HeadTags as Html
+import qualified Html.Style as Html
 
 spec :: Spec
 spec = describe "HtmlRendererSpec" $ do
@@ -23,3 +25,7 @@ spec = describe "HtmlRendererSpec" $ do
             render (Meta [BasicAttribute ("content", "text/html")])
                 `shouldBe`
                 "<meta content=\"text/html\" />"
+        it "should render Style" $
+            render (Style $ Html.StyleElement ".body" [Html.StyleProperty ("padding", "12px")] )
+                `shouldBe`
+                "<style>.body {padding: 12px;}</style>"
