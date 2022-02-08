@@ -29,7 +29,7 @@ spec = describe "HtmlRendererSpec" $ do
                 "<meta content=\"text/html\" />"
         it "should render Style" $
             render (
-                Style $ [Html.StyleElement ".body" [Html.StyleProperty ("padding", "12px")]]
+                Style [Html.StyleElement ".body" [Html.StyleProperty ("padding", "12px")]]
             ) `shouldBe`
             "<style>.body {padding: 12px;}</style>"
         it "should render Head with children tags" $
@@ -39,7 +39,7 @@ spec = describe "HtmlRendererSpec" $ do
                     Base [BasicAttribute ("href", "https://example.com")],
                     Link [BasicAttribute ("href", "https://link.com")],
                     Meta [BasicAttribute ("content", "text/html")],
-                    Style $ [
+                    Style [
                         Html.StyleElement ".body" [Html.StyleProperty ("padding", "12px")],
                         Html.StyleElement "#h1" [Html.StyleProperty ("font-size", "120em")]
                     ]
@@ -85,36 +85,36 @@ spec = describe "HtmlRendererSpec" $ do
                 render (SectionTag Address [] [PlainText "address"]) `shouldBe` "<address>address</address>"
         describe "GroupingTag" $ do
             it "should render P" $
-                render (GroupingTag P [] $ [PlainText "p"]) `shouldBe` "<p>p</p>"
+                render (GroupingTag P [] [PlainText "p"]) `shouldBe` "<p>p</p>"
             it "should render Hr" $
-                render (GroupingTag Hr [] $ [PlainText "hr"]) `shouldBe` "<hr>hr</hr>"
+                render (GroupingTag Hr [] [PlainText "hr"]) `shouldBe` "<hr>hr</hr>"
             it "should render Blockquote" $
-                render (GroupingTag Blockquote [] $ [PlainText "blockquote"]) `shouldBe` "<blockquote>blockquote</blockquote>"
+                render (GroupingTag Blockquote [] [PlainText "blockquote"]) `shouldBe` "<blockquote>blockquote</blockquote>"
             it "should render Ol" $
-                render (GroupingTag Ol [] $ [PlainText "ol"]) `shouldBe` "<ol>ol</ol>"
+                render (GroupingTag Ol [] [PlainText "ol"]) `shouldBe` "<ol>ol</ol>"
             it "should render Ul" $
-                render (GroupingTag Ul [] $ [PlainText "ul"]) `shouldBe` "<ul>ul</ul>"
+                render (GroupingTag Ul [] [PlainText "ul"]) `shouldBe` "<ul>ul</ul>"
             it "should render Menu" $
-                render (GroupingTag Menu [] $ [PlainText "menu"]) `shouldBe` "<menu>menu</menu>"
+                render (GroupingTag Menu [] [PlainText "menu"]) `shouldBe` "<menu>menu</menu>"
             it "should render Li" $
-                render (GroupingTag Li [] $ [PlainText "li"]) `shouldBe` "<li>li</li>"
+                render (GroupingTag Li [] [PlainText "li"]) `shouldBe` "<li>li</li>"
             it "should render Dl" $
-                render (GroupingTag Dl [] $ [PlainText "dl"]) `shouldBe` "<dl>dl</dl>"
+                render (GroupingTag Dl [] [PlainText "dl"]) `shouldBe` "<dl>dl</dl>"
             it "should render Dt" $
-                render (GroupingTag Dt [] $ [PlainText "dt"]) `shouldBe` "<dt>dt</dt>"
+                render (GroupingTag Dt [] [PlainText "dt"]) `shouldBe` "<dt>dt</dt>"
             it "should render Dd" $
-                render (GroupingTag Dd [] $ [PlainText "dd"]) `shouldBe` "<dd>dd</dd>"
+                render (GroupingTag Dd [] [PlainText "dd"]) `shouldBe` "<dd>dd</dd>"
             it "should render Figure" $
-                render (GroupingTag Figure [] $ [PlainText "figure"]) `shouldBe` "<figure>figure</figure>"
+                render (GroupingTag Figure [] [PlainText "figure"]) `shouldBe` "<figure>figure</figure>"
             it "should render Figcaption" $
-                render (GroupingTag Figcaption [] $ [PlainText "figcaption"]) `shouldBe` "<figcaption>figcaption</figcaption>"
+                render (GroupingTag Figcaption [] [PlainText "figcaption"]) `shouldBe` "<figcaption>figcaption</figcaption>"
             it "should render Main" $
-                render (GroupingTag Main [] $ [PlainText "main"]) `shouldBe` "<main>main</main>"
+                render (GroupingTag Main [] [PlainText "main"]) `shouldBe` "<main>main</main>"
             it "should render Div" $
-                render (GroupingTag Div [] $ [PlainText "div"]) `shouldBe` "<div>div</div>"
+                render (GroupingTag Div [] [PlainText "div"]) `shouldBe` "<div>div</div>"
         describe "TextTag" $ do
             it "should render Em" $
-                render (TextTag Em [] $ [PlainText "em"]) `shouldBe` "<em>em</em>"
+                render (TextTag Em [] [PlainText "em"]) `shouldBe` "<em>em</em>"
             it "should render Strong" $
                 render (TextTag Strong [] [PlainText "strong"]) `shouldBe` "<strong>strong</strong>"
             it "should render Small" $
