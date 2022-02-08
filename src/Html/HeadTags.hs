@@ -12,5 +12,5 @@ data HeadTag
     | Base [Attribute]
     | Link [Attribute]
     | Meta [Attribute]
-    | Style Style
+    | Style [Style]
     deriving (Show, Eq, Ord)
