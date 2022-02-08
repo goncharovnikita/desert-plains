@@ -26,11 +26,19 @@ source-repository head
 library
   exposed-modules:
       Helpers
+      Html.Attribute
+      Html.Body
+      Html.BodyTags
+      Html.Head
+      Html.HeadTags
+      Html.Html
+      Html.Style
+      HtmlRenderer
       Lib
       Model
       Parser
+      Parser.Model
       ReactRenderer
-      Renderer
   other-modules:
       Paths_desert_plains
   hs-source-dirs:
@@ -68,6 +76,7 @@ test-suite desert-plains-test
   main-is: Spec.hs
   other-modules:
       HelpersSpec
+      HtmlRendererSpec
       ParserSpec
       Paths_desert_plains
   hs-source-dirs:
