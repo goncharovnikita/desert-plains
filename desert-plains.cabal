@@ -37,6 +37,7 @@ library
       Lib
       Model
       Parser
+      Parser.Lexer
       Parser.Model
       ReactRenderer
   other-modules:
