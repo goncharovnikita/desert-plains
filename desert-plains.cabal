@@ -25,6 +25,7 @@ source-repository head
 
 library
   exposed-modules:
+      Component
       Helpers
       Html.Attribute
       Html.Body
@@ -37,8 +38,6 @@ library
       Lib
       Model
       Parser
-      Parser.Model
-      ReactRenderer
   other-modules:
       Paths_desert_plains
   hs-source-dirs:
@@ -71,7 +70,7 @@ executable desert-plains-exe
     , parsec
   default-language: Haskell2010
 
-test-suite desert-plains-test
+test-suite desert-plains
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:

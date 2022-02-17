@@ -1,2 +1,8 @@
 cradle:
   stack:
+    - path: "./test/"
+      component: "test:desert-plains"
+    - path: "./src"
+      component: "lib:desert-plains"
+    - path: "./app"
+      component: "desert-plains:exe"

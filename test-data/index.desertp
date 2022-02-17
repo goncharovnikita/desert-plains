@@ -66,39 +66,12 @@
         "Hello there, in body!"
         [h1.title "This page rendered by Desert Plains in React!"]
         [div.content
-            [div.component-demo
-                [Counter up name="Up"]
-                [Counter name="Down 2"]
-                [Welcommer name="John Doe"]
-            ]
+            [h1.title "Hello, world!"]
         ]
         [div.footer
             [a.link href="/about"
                 "About"
             ]
-        ]
-    ]
-]
-
-[Counter[up, name]
-    {{
-        const [count, setCount] = useState(0);
-        const increment = useCallback(() => setCount(c => up ? c + 1 : c - 1), []);
-    }}
-    
-    "Counter ${name} is ${count}"
-    [button.btn onClick={increment}
-        "Increment"
-    ]
-]
-
-[Welcommer[name]
-    {{
-        const capitalizedName = name.toUpperCase();
-    }}
-    [div.welcommer
-        [h1
-            {Hello, #capitalizedName}
         ]
     ]
 ]

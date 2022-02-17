@@ -1,10 +1,10 @@
 module Lib
     ( module Model
     , module Parser
-    , module ReactRenderer
+    , module HtmlRenderer
     )
  where
 
 import Model
 import Parser
-import ReactRenderer
+import HtmlRenderer

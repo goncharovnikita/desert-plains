@@ -12,6 +12,7 @@ import Html.Html (Html(..))
 import Html.Attribute (Attribute(..))
 import Html.HeadTags
 import Html.BodyTags
+import Model (Template(..))
 
 class Renderable a where
     render :: a -> Text
@@ -24,6 +25,9 @@ instance Renderable Text where
 
 instance TagNameHolder Text where
     getTagName = id
+
+instance Renderable Template where
+    render (Template html) = render html
 
 instance Renderable Html.Style.Style where
     render template = case template of

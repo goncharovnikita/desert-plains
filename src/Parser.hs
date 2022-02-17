@@ -1,42 +1,19 @@
 -- {-# LANGUAGE GeneralisedNewtypeDeriving #-}
-module Parser ( 
-    parseTemplate,
-    parseChar,
-    parseCharCond,
-    parseText,
-    parseTitle,
-    parseHead,
-    execTemplateParser,
-    execTemplateParserForResult,
-    parseStyleProperty,
-    parseAttributes,
-    parseBasicAttribute,
-    parseInterpolatedAttribute,
-    parseBoolAttribute,
-    parseInterpolatedString,
-    parseClass,
-    parseAllClasses,
-    parseTextWithPrefix,
-    parseStyleContents,
-    parseStyleNode,
-    parseComponentLogic,
-    parseComponentProps,
-    parseBodyContentItem,
-    parseBodyContents,
-    parseComponent,
-    parseComponents,
-    spanP,
-    ws,
-    interWhitespace,
-    interpolatedStringLiteral,
-    TemplateParser(..)
-) where
+module Parser where
 
 import ClassyPrelude
 import Model
 import Data.Char (isSpace, isUpper, isLetter)
 import Control.Monad.Writer
 import Helpers
+import Html.Head (Head(Head))
+import Html.Body (Body(Body))
+import Html.Attribute
+import Html.Style (Style (StyleElement, StyleProperty))
+import Component
+import Html.BodyTags
+import Html.HeadTags (HeadTag (Title, Style, Meta, Base, Link))
+import Html.Html (Html(Html))
 
 newtype TemplateParser v = TemplateParser {
     runTemplateParser :: Text -> Writer [Text] (Maybe (Text, v))
@@ -107,96 +84,72 @@ instance Alternative TemplateParser where
 
 
 parseTemplate :: TemplateParser Template
-parseTemplate = Html
-    <$> parseHead
-    <*> parseBody
-    <*> parseComponents
+parseTemplate = Template <$> (Html <$> parseHead <*> parseBody)
 
 
 ----- HEAD PARSERS
-parseHead :: TemplateParser HeadNodeFamily
-parseHead = HeadNode <$> parseBaseTag "head" parseHeadContents
+parseHead :: TemplateParser Head
+parseHead = uncurry Head <$> parseTagWithAttributes "head" parseHeadContents
 
-parseHeadContents :: TemplateParser [HeadNodeFamily]
-parseHeadContents = many (parseTitle <|> parseHeadStyle)
+parseHeadContents :: TemplateParser [HeadTag]
+parseHeadContents = many
+    (parseTitle
+    <|> parseBase
+    <|> parseMeta
+    <|> parseLink
+    <|> parseHeadStyle
+    )
 
-parseTitle :: TemplateParser HeadNodeFamily
+parseTitle :: TemplateParser HeadTag
 parseTitle = Title <$> parseBaseTag "title" stringLiteral
 
-parseHeadStyle :: TemplateParser HeadNodeFamily
-parseHeadStyle = StyleNode <$> parseStyleNode
+parseBase :: TemplateParser HeadTag
+parseBase = Base <$> parseSelfClosingTag "base"
+
+parseLink :: TemplateParser HeadTag
+parseLink = Link <$> parseSelfClosingTag "link"
+
+parseMeta :: TemplateParser HeadTag
+parseMeta = Meta <$> parseSelfClosingTag "meta"
+
+parseHeadStyle :: TemplateParser HeadTag
+parseHeadStyle = Style <$> parseBaseTag "style" parseStyleContents
 
 ----- BODY PARSERS
-parseBody :: TemplateParser BodyNodeFamily
-parseBody = uncurry BodyNode <$> parseTagWithAttributes "body" parseBodyContents
+parseBody :: TemplateParser Body
+parseBody = uncurry Body <$> parseTagWithAttributes "body" parseBodyContents
 
-parseBodyContents :: TemplateParser [BodyNodeFamily]
+parseBodyContents :: TemplateParser [BodyTag]
 parseBodyContents = many parseBodyContentItem
 
-parseBodyContentItem :: TemplateParser BodyNodeFamily
+parseBodyContentItem :: TemplateParser BodyTag
 parseBodyContentItem = 
-    interWhitespace $ TextNode <$> stringLiteral
-    <|> bodyParser H1 "h1"
-    <|> bodyParser Div "div"
-    <|> bodyParser A "a"
-    <|> bodyParser Button "button"
-    <|> interWhitespace parseComponentExpression
-    <|> BodyInterpolatedString <$> interWhitespace parseInterpolatedString
+    interWhitespace $
+    PlainText <$> stringLiteral
+    <|> bodyParser (SectionTag Article) "article"
+    <|> bodyParser (SectionTag Section) "section"
+    <|> bodyParser (SectionTag Nav) "nav"
+    <|> bodyParser (SectionTag Aside) "aside"
+    <|> bodyParser (SectionTag H1) "h1"
+    <|> bodyParser (SectionTag H2) "h2"
+    <|> bodyParser (SectionTag H3) "h3"
+    <|> bodyParser (SectionTag H4) "h4"
+    <|> bodyParser (SectionTag H5) "h5"
+    <|> bodyParser (SectionTag H6) "h6"
+    <|> bodyParser (SectionTag Hgroup) "hgroup"
+    <|> bodyParser (SectionTag Header) "header"
+    <|> bodyParser (SectionTag Footer) "footer"
+    <|> bodyParser (SectionTag Address) "address"
    
 
-bodyParser :: ([Attribute] -> [BodyNodeFamily] -> BodyNodeFamily) -> Text -> TemplateParser BodyNodeFamily
+bodyParser :: ([Attribute] -> [BodyTag] -> BodyTag) -> Text -> TemplateParser BodyTag
 bodyParser constr tagName = interWhitespace $ uncurry constr <$> parseTagWithAttributes tagName parseBodyContents
 
-parseComponentExpression :: TemplateParser BodyNodeFamily
-parseComponentExpression = (\fNameLetter restName attrs children -> ComponentExpression (pack [fNameLetter] <> restName) attrs children)
-    <$> (parseChar '[' *> parseCharCond isUpper)
-    <*> contiguousTextLiteral
-    <*> interWhitespace parseAttributes
-    <*> (parseBodyContents <* parseChar ']')
-
-parseInterpolatedString :: TemplateParser InterpolatedString
-parseInterpolatedString = InterpolatedString
-    <$> (parseChar '{' *> some interpolatedStringLiteral <* parseChar '}')
-
-interpolatedStringLiteral :: TemplateParser InterpolatedString
-interpolatedStringLiteral =
-            (InterpolatedValue <$> (parseChar '#' *> spanP (`notElem` [' ', '}', '#'])))
-        <|> (InterpolatedText <$> strictSpanP (`notElem` ['#', '}']))
-
------ COMPONENTS PARSERS
-
-parseComponents :: TemplateParser [Component]
-parseComponents = many (interWhitespace parseComponent)
-
-parseComponent :: TemplateParser Component
-parseComponent = Component
-    <$> parseComponentName
-    <*> (interWhitespace parseComponentProps <|> (ws >> return []))
-    <*> interWhitespace parseComponentLogic
-    <*> (some (interWhitespace parseBodyContentItem) <* parseChar ']')
-
-parseComponentName :: TemplateParser Text
-parseComponentName = (\fLetterOfName restName -> pack [fLetterOfName] <> restName)
-    <$> (parseChar '[' *> parseCharCond isUpper)
-    <*> spanP isLetter
-
-parseComponentProps :: TemplateParser [Text]
-parseComponentProps = parseChar '[' *> propsLiteral <* parseChar ']'
-    where propsLiteral = sepBy (parseChar ',' *> ws) (spanP isLetter)
-
-parseComponentLogic :: TemplateParser [Text]
-parseComponentLogic = many (interWhitespace parseComponentLogicItem)
-    where parseComponentLogicItem = parseText "{{" *> wsOrNewline *> logicString <* wsOrNewline <* parseText "}}"
-          logicString = longSpanP 2 (/="}}")
-
 ----- STYLE PARSERS
-parseStyleNode :: TemplateParser StyleFamily
-parseStyleNode = Style <$> parseBaseTag "style" parseStyleContents
-
-parseStyleContents :: TemplateParser [StyleFamily]
+parseStyleContents :: TemplateParser [Style]
 parseStyleContents = many parseStyleElement 
 
-parseStyleElement :: TemplateParser StyleFamily
+parseStyleElement :: TemplateParser Style
 parseStyleElement =
     let nodeNameTextLiteral = spanP (`notElem` ['\n', ']', '.', '#', ' '])
         nodeNameLiteral
@@ -211,7 +164,7 @@ parseStyleElement =
 parseTextWithPrefix :: Text -> TemplateParser Text -> TemplateParser Text
 parseTextWithPrefix prefix parser = (<>) <$> parseText prefix <*> parser
 
-parseStyleProperty :: TemplateParser StyleFamily
+parseStyleProperty :: TemplateParser Style
 parseStyleProperty = curry StyleProperty
     <$> (ws *> textLiteral <* parseChar ':' <* ws)
     <*> (ws *> propertyLiteral <* parseChar ';' <* wsOrNewline)
@@ -248,7 +201,12 @@ parseText text = TemplateParser $ \text' ->
         Just (text'', template) -> writer (Just (text'', fromList template), logged)
 
 parseBaseTag :: Text -> TemplateParser a -> TemplateParser a
-parseBaseTag tag childParser = interWhitespace (parseText ("[" <> tag) *> interWhitespace childParser <* parseChar ']')
+parseBaseTag tag childParser = interWhitespace
+    (parseText ("[" <> tag) *> interWhitespace childParser <* parseChar ']')
+
+parseSelfClosingTag :: Text -> TemplateParser [Attribute]
+parseSelfClosingTag tag = interWhitespace
+    (parseText ("[" <> tag) *> interWhitespace parseAttributes <* parseChar ']')
 
 parseTagWithAttributes :: Text -> TemplateParser a -> TemplateParser ([Attribute], a)
 parseTagWithAttributes tag childParser = TemplateParser $ \text ->
@@ -267,8 +225,6 @@ parseAttributes :: TemplateParser [Attribute]
 parseAttributes = many
     (   parseAllClasses
     <|> (ws *> parseBasicAttribute <* ws)
-    <|> (ws *> parseBoolAttribute <* ws)
-    <|> (ws *> parseInterpolatedAttribute <* ws)
     )
 
 parseAllClasses :: TemplateParser Attribute
@@ -281,16 +237,6 @@ parseBasicAttribute :: TemplateParser Attribute
 parseBasicAttribute = curry BasicAttribute
     <$> (contiguousTextLiteral <* parseChar '=')
     <*> stringLiteral
-
-parseBoolAttribute :: TemplateParser Attribute
-parseBoolAttribute = BoolAttribute <$> (strictSpanP isLetter <* strictSpanP (`elem` [' ', '\n', ']']))
-
-parseInterpolatedAttribute :: TemplateParser Attribute
-parseInterpolatedAttribute = curry InterpolatedAttribute
-    <$> (contiguousTextLiteral <* parseText "={")
-    <*> (interpolatedAttributeValue <* parseChar '}')
-        where interpolatedAttributeValue = spanP (`notElem` predicates)
-              predicates = ['}', '\n']
 
 stringLiteral :: TemplateParser Text
 stringLiteral = parseChar '"' *> spanP (/= '"') <* parseChar '"'
