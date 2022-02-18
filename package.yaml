@@ -44,7 +44,7 @@ executables:
     - desert-plains
 
 tests:
-  desert-plains-test:
+  desert-plains:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:

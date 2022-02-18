@@ -14,3 +14,6 @@ run:
 
 lint:
 	hlint .
+
+build-example:
+	stack exec desert-plains-exe -- --src ./test-data/index.desertp --dest ./test-data/index.html

@@ -29,54 +29,71 @@ parseArgs = do
         [Src src, Dest dest, Watch] -> return $ Right (src, dest, True)
         _ -> return $ Left "source and destination must be provided as --src src --dest dest"
     
-compilePlain :: (Text, Text) -> IO ()
+compilePlain :: (Text, Text) -> IO (Either Text ())
 compilePlain (src, dest) = do
     srcFile <- readFileUtf8 $ unpack src
 
     let parseResult = execTemplateParser parseTemplate srcFile
     case parseResult of
-        Left errorText -> putStr $ "Error parsing template:" <> errorText
+        Left errorText -> return $ Left $ "Error parsing template:" <> errorText
         Right (templ, logged) -> do
             putStr $ concat ["\nCompilation messages:\n", logged, "\n\n"]
             putStr $ concat ["\nCompiled template\n", pack $ show templ, "\n\n"]
             let renderedTemplate = render templ
             putStrLn $ "About to write " <> renderedTemplate
             writeFileUtf8 (unpack dest) renderedTemplate
+            return $ Right ()
 
 recompile :: (Text, Text) -> Action
 recompile (src, dest) evt =
     case evt of
-        Modified fpath _ _ ->
-            when (".desertp" `isSuffixOf` fpath) $ do
+        Modified fpath _ _ -> do
+            putStrLn $ concat ["detected changes in ", pack fpath, ", watching on ", src]
+            when (unpack src `isSuffixOf` fpath) $ do
                 putStrLn "detected changes, recompiling...\n"
-                compilePlain (src, dest)
+                r <- compilePlain (src, dest)
+                case r of
+                    Left err -> putStrLn err
+                    Right () -> putStrLn "template recompiled"
         _ -> return ()
 
-watchAndRecompile :: (Text, Text) -> IO ()
+watchAndRecompile :: (Text, Text) -> IO (Either Text ())
 watchAndRecompile (src, dest) = withManager $ \mgr -> do
     -- start a watching job (in the background)
-    let doRecompile = recompile (concat [src, "/", "index.desertp"], dest)
+    let doRecompile = recompile (src, dest)
+    case getDirFromSrc src of
+        Left err -> return $ Left err
+        Right dirToWatch -> do
+            putStrLn $ "watching dir " <> dirToWatch
+            compilePlain (src, dest)
 
-    compilePlain (concat [src, "/", "index.desertp"], dest)
+            watchDir
+                mgr          -- manager
+                (unpack dirToWatch) -- directory to watch
+                (const True) -- predicate
+                doRecompile  -- action
 
-    watchDir
-        mgr          -- manager
-        (unpack src) -- directory to watch
-        (const True) -- predicate
-        doRecompile  -- action
+            -- sleep forever (until interrupted)
+            forever $ threadDelay 1000000
 
-    -- sleep forever (until interrupted)
-    forever $ threadDelay 1000000
+getDirFromSrc :: Text -> Either Text Text
+getDirFromSrc t =
+    let spl = splitElem '/' t
+    in case fromNullable spl of
+        Nothing -> Left "could not get watch directory from src" 
+        Just s -> Right $ intercalate "/" $ init s
+
+runApp :: Either Text (Text, Text, Bool) -> IO (Either Text ())
+runApp (Left e) = return $ Left e
+runApp (Right (src, dest, watch)) = case watch of
+        True -> watchAndRecompile (src, dest)
+        False -> compilePlain (src, dest)
 
 main :: IO ()
 main = do
-    putStrLn "Starting to parse"
     parsedArgs <- parseArgs
-    case parsedArgs of
-        Left errMsg -> print errMsg
-        Right (src, dest, watch) -> do
-            case watch of
-                True -> do
-                    watchAndRecompile (src, dest)
-                _ -> do
-                    compilePlain (concat [src, "/", "index.desertp"], dest)
+    putStrLn "Starting to parse"
+    result <- runApp parsedArgs
+    case result of
+        Left err -> putStrLn err
+        Right () -> putStrLn "compilation finished"
