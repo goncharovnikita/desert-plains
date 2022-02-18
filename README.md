@@ -10,7 +10,6 @@ Html, css and js are all written in one file
   - [Why?](#why)
   - [Syntax](#syntax)
     - [Css](#css)
-    - [Components](#components)
   - [Examples](#examples)
   - [Usage](#usage)
 - [TODO:](#todo)
@@ -75,39 +74,6 @@ Will be compiled to
         width: auto;
     }
 </style>
-```
-
-### Components
-
-Same as html tag, but with props and raw javascript support
-
-Component definition:
-
-```
-[Counter[up, name] -- up and name are props
-    -- {{ raw javascript }}
-    {{
-        const [count, setCount] = useState(0);
-        const increment = useCallback(() => setCount(c => up ? c + 1 : c - 1), []);
-    }}
-
-    -- Every string is interpolated after compilation by default (i.e. will look like this: `Counter ${name} is ${count}`)
-    -- And all props and javascript variables are in scope of component
-    
-    "Counter ${name} is ${count}"
-    [button.btn onClick={increment}
-        "Increment"
-    ]
-]
-```
-
-Component usage:
-
-```
-    -- Bool props without value will be fallback to true
-    [Counter up name="Up"]
-    -- Not passed props fallback to undefined
-    [Counter name="Down 2"]
 ```
 
 ## Examples
