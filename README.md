@@ -21,9 +21,10 @@ Html, css and js are all written in one file
 ### Mac OS
 
 ```bash
-  curl -L https://github.com/goncharovnikita/desert-plains/releases/v1.0.5/download/desert-plains-1.0.5-macOS > ./desert-plains-1.0.5
-  mv ./desert-plains-1.0.5 /usr/local/bin/desert-plains
-  rm ./desert-plains-1.0.5
+  curl -L https://github.com/goncharovnikita/desert-plains/releases/latest/download/desert-plains-macOS.tar.gz > ./desert-plains-macos.tar.gz
+  tar -xvzf ./desert-plains-macos.tar.gz
+  mv ./desert-plains /usr/local/bin/desert-plains
+  rm ./desert-plains-macos.tar.gz
 ```
 
 ## Why?
