@@ -29,15 +29,15 @@ jobs:
           stack-version: "2.7.3"
           stack-setup-ghc: true
 
-    - name: Cache multiple paths
-      uses: actions/cache@v2
-      with:
-        path: |
-          ./stack-work
-        key: ${{ runner.os }}-${{ hashFiles('./stack.yaml.lock') }}
-
       - name: Build binary
         run: make install
+
+      - name: Cache stack work
+        uses: actions/cache@v2
+        with:
+          path: |
+            ./stack-work
+          key: ${{ runner.os }}-${{ hashFiles('./stack.yaml.lock') }}
 
       - if: matrix.os == 'windows-latest'
         name: Set extension to .exe on Windows

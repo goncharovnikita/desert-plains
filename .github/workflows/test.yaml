@@ -1,9 +1,10 @@
+name: Test
+
 on:
   pull_request:
     branches:
       - '**'
 
-name: Test
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -21,11 +22,12 @@ jobs:
           stack-version: "2.7.3"
           stack-setup-ghc: true
 
-      - name: Cache multiple paths
+      - name: Run test
+        run: make test
+
+      - name: Cache stack work
         uses: actions/cache@v2
         with:
           path: |
             ./stack-work
           key: ${{ runner.os }}-${{ hashFiles('./stack.yaml.lock') }}
-
-      - run: make test
