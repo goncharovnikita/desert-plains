@@ -7,12 +7,24 @@ Language files has extension `.desertp`
 Html, css and js are all written in one file
 
 - [desert-plains](#desert-plains)
+  - [Installation](#installation)
+    - [Mac OS](#mac-os)
   - [Why?](#why)
   - [Syntax](#syntax)
     - [Css](#css)
   - [Examples](#examples)
   - [Usage](#usage)
 - [TODO:](#todo)
+
+## Installation
+
+### Mac OS
+
+```bash
+  curl -L https://github.com/goncharovnikita/desert-plains/releases/v1.0.5/download/desert-plains-1.0.5-macOS > ./desert-plains-1.0.5
+  mv ./desert-plains-1.0.5 /usr/local/bin/desert-plains
+  rm ./desert-plains-1.0.5
+```
 
 ## Why?
 

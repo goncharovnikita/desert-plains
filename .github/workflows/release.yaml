@@ -104,7 +104,9 @@ jobs:
           echo "::set-output name=upload_url::$(cat ~/download/release_url.txt)"
 
       - name: Add binary to archive
-        run: tar -zcvf ./desert-plains-${{ runner.os }}.tar.gz ${{ steps.set_binary_name.outputs.BINARY_PATH }}
+        run:  |
+          mv ${{ steps.set_binary_name.outputs.BINARY_PATH }} ./desert-plains
+          tar -zcvf ./desert-plains-${{ runner.os }}.tar.gz ./desert-plains
 
       - name: Upload Release Asset
         id: upload-release-asset
