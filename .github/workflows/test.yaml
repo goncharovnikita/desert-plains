@@ -22,12 +22,14 @@ jobs:
           stack-version: "2.7.3"
           stack-setup-ghc: true
 
-      - name: Run test
-        run: make test
-
-      - name: Cache stack work
+      - name: Cache dependencies
         uses: actions/cache@v2
         with:
           path: |
-            ./stack-work
-          key: ${{ runner.os }}-${{ hashFiles('./stack.yaml.lock') }}
+            ~/.stack
+          key: ${{ runner.os }}-${{ hashFiles('./stack.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-
+
+      - name: Run test
+        run: make test
