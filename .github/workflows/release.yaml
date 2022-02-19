@@ -1,4 +1,4 @@
-name: DesertPlains Release
+name: Release
 
 on:
   # Trigger the workflow on the new 'v*' tag created
@@ -74,7 +74,7 @@ jobs:
         run: echo "::set-env name=EXT::.exe"
 
       - name: Set binary path name
-        run: echo "::set-env name=BINARY_PATH::${stack path --local-bin}/desert-plains-exe${{ env.EXT }}"
+        run: echo "::set-env name=BINARY_PATH::$(stack path --local-bin)/desert-plains-exe${{ env.EXT }}"
 
       - name: Compress binary
         uses: svenstaro/upx-action@2.0.1
