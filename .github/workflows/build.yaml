@@ -29,24 +29,27 @@ jobs:
           stack-version: "2.7.3"
           stack-setup-ghc: true
 
-      - name: Build binary
-        run: make install
-
       - name: Cache stack work
         uses: actions/cache@v2
         with:
           path: |
             ./stack-work
+            ~/.stack
           key: ${{ runner.os }}-${{ hashFiles('./stack.yaml.lock') }}
 
+      - name: Build binary
+        run: make install
+
       - if: matrix.os == 'windows-latest'
+        id: set_ext
         name: Set extension to .exe on Windows
-        run: echo "::set-env name=EXT::.exe"
+        run: echo "::set-output name=EXT::.exe"
 
       - name: Set binary path name
-        run: echo "::set-env name=BINARY_PATH::$(stack path --local-bin)/desert-plains-exe${{ env.EXT }}"
+        id: set_binary_name
+        run: echo "::set-output name=BINARY_PATH::$(stack path --local-bin)/desert-plains-exe${{ steps.set_ext.outputs.EXT }}"
 
       - name: Compress binary
         uses: svenstaro/upx-action@2.0.1
         with:
-          file: ${{ env.BINARY_PATH }}
+          file: ${{ steps.set_binary_name.outputs.BINARY_PATH }}
