@@ -1,0 +1,56 @@
+name: Build
+
+on:
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  build_binary:
+    name: ${{ matrix.os }}/GHC ${{ matrix.ghc }}/${{ github.ref }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest]
+        ghc:
+          - "8.10.7"
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2.4.0
+
+      - name: Setup Haskell
+        uses: haskell/actions/setup@v1
+        with:
+          ghc-version: "8.10.7"
+          cabal-version: "3.6.2.0"
+          enable-stack: true
+          stack-no-global: true
+          stack-version: "2.7.3"
+          stack-setup-ghc: true
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.stack
+          key: ${{ runner.os }}-${{ hashFiles('./stack.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-
+
+      - name: Build binary
+        run: make install
+
+      - if: matrix.os == 'windows-latest'
+        id: set_ext
+        name: Set extension to .exe on Windows
+        run: echo "::set-output name=EXT::.exe"
+
+      - name: Set binary path name
+        id: set_binary_name
+        run: echo "::set-output name=BINARY_PATH::$(stack path --local-bin)/desert-plains-exe${{ steps.set_ext.outputs.EXT }}"
+
+      - name: Compress binary
+        uses: svenstaro/upx-action@2.0.1
+        with:
+          file: ${{ steps.set_binary_name.outputs.BINARY_PATH }}

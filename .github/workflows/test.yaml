@@ -1,15 +1,17 @@
+name: Test
+
 on:
   pull_request:
     branches:
       - '**'
 
-name: Test
 jobs:
   test:
     runs-on: ubuntu-latest
     name: Test
     steps:
       - uses: actions/checkout@v2
+
       - name: Setup Haskell
         uses: haskell/actions/setup@v1
         with:
@@ -19,4 +21,15 @@ jobs:
           stack-no-global: true
           stack-version: "2.7.3"
           stack-setup-ghc: true
-      - run: make test
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.stack
+          key: ${{ runner.os }}-${{ hashFiles('./stack.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-
+
+      - name: Run test
+        run: make test
