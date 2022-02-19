@@ -6,7 +6,7 @@ on:
       - '**'
 
 jobs:
-  build:
+  build_binary:
     name: ${{ matrix.os }}/GHC ${{ matrix.ghc }}/${{ github.ref }}
     runs-on: ${{ matrix.os }}
     strategy:
